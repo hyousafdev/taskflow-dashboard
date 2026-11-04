@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global Base Styles */
+@layer base {
+  * {
+    @apply box-border;
+  }
+
+  body {
+    @apply antialiased font-sans;
+  }
+}
