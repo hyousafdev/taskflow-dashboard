@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useAppSelector } from "@/useAppStore";
+import { useAppSelector } from "./useAppStore";
 
 export function useTaskStats() {
   // Store se saari tasks padho
