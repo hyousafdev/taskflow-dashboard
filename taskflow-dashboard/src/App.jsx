@@ -3,6 +3,7 @@ import { useAppSelector } from "@/hooks/useAppStore";
 import { Header } from "@/components/layout/Header";
 import { StatsBar } from "@/components/layout/StatsBar"; // NEW
 import { AddTaskForm } from "@/components/tasks/AddTaskForm"; // NEW import
+import { FilterBar } from "@/components/tasks/FilterBar"; // NEW
 
 export default function App() {
   const dark = useAppSelector((s) => s.ui.dark);
@@ -16,7 +17,8 @@ export default function App() {
       <div className="max-w-2xl mx-auto px-4 py-10">
         <Header />
         <StatsBar />
-        <AddTaskForm /> {/* NEW */}
+        <AddTaskForm />
+        <FilterBar /> {/* NEW */}
       </div>
     </div>
   );
