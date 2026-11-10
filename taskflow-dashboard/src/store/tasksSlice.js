@@ -70,6 +70,22 @@ const tasksSlice = createSlice({
       if (task) Object.assign(task, action.payload.updates);
     },
 
+    // NEW: payload = { activeId, overId }
+    // activeId = jo task utha kar rakha, overId = jis task ki jagah par chhoda
+    reorderTasks: (state, action) => {
+      const { activeId, overId } = action.payload;
+
+      // Poore array mein dono ki position dhoondo
+      const from = state.tasks.findIndex((t) => t.id === activeId);
+      const to = state.tasks.findIndex((t) => t.id === overId);
+
+      if (from === -1 || to === -1 || from === to) return;
+
+      // Pehle nikalo, phir nayi jagah par daalo
+      const [moved] = state.tasks.splice(from, 1);
+      state.tasks.splice(to, 0, moved);
+    },
+
     // NEW: koi payload nahi chahiye
     // Sirf wahi tasks rakho jo completed NAHI hain
     clearCompleted: (state) => {
@@ -79,7 +95,13 @@ const tasksSlice = createSlice({
 });
 
 // NEW: clearCompleted export mein add
-export const { addTask, toggleTask, deleteTask, editTask, clearCompleted } =
-  tasksSlice.actions;
+export const {
+  addTask,
+  toggleTask,
+  deleteTask,
+  editTask,
+  clearCompleted,
+  reorderTasks, // NEW
+} = tasksSlice.actions;
 
 export default tasksSlice.reducer;
