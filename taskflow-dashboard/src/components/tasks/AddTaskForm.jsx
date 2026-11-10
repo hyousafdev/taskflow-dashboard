@@ -9,20 +9,25 @@ import { addTask } from "@/store/tasksSlice";
 export function AddTaskForm() {
   const dispatch = useAppDispatch();
 
-  // Local state: sirf is form ke liye, store mein nahi jaati
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("medium");
+  const [dueDate, setDueDate] = useState(""); // NEW: "" = date nahi chuni
 
   const handleAdd = () => {
-    const trimmed = title.trim(); // aage-peeche ke spaces hatao
-    if (!trimmed) return;         // khali ho to kuch mat karo
+    const trimmed = title.trim();
+    if (!trimmed) return;
 
-    // Store ko action bhejo
-    dispatch(addTask({ title: trimmed, priority }));
+    dispatch(
+      addTask({
+        title: trimmed,
+        priority,
+        dueDate: dueDate || null, // NEW: khali string ko null bana do
+      })
+    );
 
-    // Form reset
     setTitle("");
     setPriority("medium");
+    setDueDate(""); // NEW
   };
 
   return (
@@ -31,29 +36,40 @@ export function AddTaskForm() {
         New Task
       </p>
 
-      {/* Mobile: upar neeche, Desktop: ek line mein */}
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-col gap-2">
+        {/* Row 1: title */}
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
           placeholder="What needs to be done?"
-          className="flex-1"
         />
 
-        <Select
-          value={priority}
-          onChange={(e) => setPriority(e.target.value)}
-          className="sm:w-36"
-        >
-          <option value="high">🔴 High</option>
-          <option value="medium">🟡 Medium</option>
-          <option value="low">🟢 Low</option>
-        </Select>
+        {/* Row 2: priority + due date + add */}
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+            className="sm:w-36"
+          >
+            <option value="high">🔴 High</option>
+            <option value="medium">🟡 Medium</option>
+            <option value="low">🟢 Low</option>
+          </Select>
 
-        <Button onClick={handleAdd} className="gap-1.5 shrink-0">
-          <Icons.Plus /> Add
-        </Button>
+          {/* NEW: date picker. color-scheme se browser ka calendar popup dark mode mein dark dikhta hai */}
+          <Input
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            aria-label="Due date"
+            className="sm:flex-1 [color-scheme:light] dark:[color-scheme:dark]"
+          />
+
+          <Button onClick={handleAdd} className="gap-1.5 shrink-0">
+            <Icons.Plus /> Add
+          </Button>
+        </div>
       </div>
     </div>
   );
