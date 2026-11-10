@@ -26,6 +26,7 @@ const SORT_OPTIONS = [
   { key: "createdAt", label: "Date" },
   { key: "title", label: "A → Z" },
   { key: "priority", label: "Priority" },
+  { key: "manual", label: "Manual" }, // NEW
 ];
 
 // Pill ke styles
@@ -39,9 +40,7 @@ export function FilterBar() {
   const dispatch = useAppDispatch();
 
   // Store se current filter settings padho
-  const { status, priority, sortBy, sortDir } = useAppSelector(
-    (s) => s.filter
-  );
+  const { status, priority, sortBy, sortDir } = useAppSelector((s) => s.filter);
 
   return (
     <div className="bg-white dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 p-4 mb-5 shadow-sm space-y-3">
@@ -58,7 +57,7 @@ export function FilterBar() {
             // Jo store mein selected hai, wahi highlight
             className={cn(
               pillBase,
-              status === opt.value ? pillActive : pillInactive
+              status === opt.value ? pillActive : pillInactive,
             )}
           >
             {opt.label}
@@ -74,7 +73,7 @@ export function FilterBar() {
             onClick={() => dispatch(setPriorityFilter(opt.value))}
             className={cn(
               pillBase,
-              priority === opt.value ? pillActive : pillInactive
+              priority === opt.value ? pillActive : pillInactive,
             )}
           >
             {opt.label}
@@ -97,12 +96,12 @@ export function FilterBar() {
               "flex items-center gap-1",
               sortBy === opt.key
                 ? "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700"
-                : pillInactive
+                : pillInactive,
             )}
           >
             {opt.label}
             {/* Arrow sirf active sort button par */}
-            {sortBy === opt.key && (
+            {sortBy === opt.key && opt.key !== "manual" && (
               <span className="text-base leading-none">
                 {sortDir === "asc" ? "↑" : "↓"}
               </span>
