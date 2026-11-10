@@ -17,23 +17,25 @@ const DUE_STYLES = {
   upcoming: "text-zinc-500 dark:text-zinc-400",
 };
 
-export function TaskItem({ task }) {
+// task = task ka data, dragHandle = drag ka button (sirf manual mode mein aata hai)
+export function TaskItem({ task, dragHandle }) {
   const dispatch = useAppDispatch();
 
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [editPriority, setEditPriority] = useState(task.priority);
-  // NEW: ?? "" kyunke purane tasks mein dueDate hota hi nahi (undefined)
+  // ?? "" kyunke purane tasks mein dueDate hota hi nahi (undefined)
   const [editDueDate, setEditDueDate] = useState(task.dueDate ?? "");
 
-  // ---- NEW: due date ka status ----
+  // Due date ka status
   const rawStatus = task.dueDate ? getDueStatus(task.dueDate) : null;
   // Completed task ko laal/peela mat dikhao: wo to ho chuka
   const dueStatus = task.completed && rawStatus ? "upcoming" : rawStatus;
 
   let dueLabel = null;
   if (task.dueDate) {
-    if (dueStatus === "overdue") dueLabel = `Overdue · ${formatDueDate(task.dueDate)}`;
+    if (dueStatus === "overdue")
+      dueLabel = `Overdue · ${formatDueDate(task.dueDate)}`;
     else if (dueStatus === "today") dueLabel = "Due today";
     else dueLabel = `Due ${formatDueDate(task.dueDate)}`;
   }
@@ -47,7 +49,7 @@ export function TaskItem({ task }) {
         updates: {
           title: trimmed,
           priority: editPriority,
-          dueDate: editDueDate || null, // NEW: khali = date hata do
+          dueDate: editDueDate || null, // khali = date hata do
         },
       })
     );
@@ -57,7 +59,7 @@ export function TaskItem({ task }) {
   const cancelEdit = () => {
     setEditTitle(task.title);
     setEditPriority(task.priority);
-    setEditDueDate(task.dueDate ?? ""); // NEW
+    setEditDueDate(task.dueDate ?? "");
     setEditing(false);
   };
 
@@ -70,6 +72,9 @@ export function TaskItem({ task }) {
           : "bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-md"
       )}
     >
+      {/* Drag handle: manual mode mein hi aata hai, warna kuch render nahi hota */}
+      {dragHandle}
+
       {/* Priority dot */}
       <div
         className={cn(
@@ -118,7 +123,7 @@ export function TaskItem({ task }) {
                 <option value="low">🟢 Low</option>
               </Select>
 
-              {/* NEW: edit mode mein date picker */}
+              {/* Edit mode mein date picker */}
               <Input
                 type="date"
                 value={editDueDate}
@@ -164,7 +169,7 @@ export function TaskItem({ task }) {
                 })}
               </span>
 
-              {/* NEW: due chip, sirf tab jab dueDate set ho */}
+              {/* Due chip: sirf tab jab dueDate set ho */}
               {dueLabel && (
                 <span
                   className={cn(
