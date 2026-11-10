@@ -50,6 +50,7 @@ const tasksSlice = createSlice({
         id: state.nextId++,
         title: action.payload.title,
         priority: action.payload.priority,
+        dueDate: action.payload.dueDate ?? null, // NEW
         completed: false,
         createdAt: Date.now(),
       });
