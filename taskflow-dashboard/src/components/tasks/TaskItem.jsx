@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { formatDueDate, getDueStatus } from "@/lib/dates";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -9,36 +10,58 @@ import { useAppDispatch } from "@/hooks/useAppStore";
 import { toggleTask, deleteTask, editTask } from "@/store/tasksSlice";
 import { PRIORITY_DOT, PRIORITY_ICONS } from "@/constants/priority";
 
-// task = { id, title, priority, completed, createdAt } (parent se aata hai)
+// Due chip ke colors
+const DUE_STYLES = {
+  overdue: "text-red-600 dark:text-red-400",
+  today: "text-amber-600 dark:text-amber-400",
+  upcoming: "text-zinc-500 dark:text-zinc-400",
+};
+
 export function TaskItem({ task }) {
   const dispatch = useAppDispatch();
 
-  // Local state: edit mode ke liye
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [editPriority, setEditPriority] = useState(task.priority);
+  // NEW: ?? "" kyunke purane tasks mein dueDate hota hi nahi (undefined)
+  const [editDueDate, setEditDueDate] = useState(task.dueDate ?? "");
+
+  // ---- NEW: due date ka status ----
+  const rawStatus = task.dueDate ? getDueStatus(task.dueDate) : null;
+  // Completed task ko laal/peela mat dikhao: wo to ho chuka
+  const dueStatus = task.completed && rawStatus ? "upcoming" : rawStatus;
+
+  let dueLabel = null;
+  if (task.dueDate) {
+    if (dueStatus === "overdue") dueLabel = `Overdue · ${formatDueDate(task.dueDate)}`;
+    else if (dueStatus === "today") dueLabel = "Due today";
+    else dueLabel = `Due ${formatDueDate(task.dueDate)}`;
+  }
 
   const saveEdit = () => {
     const trimmed = editTitle.trim();
-    if (!trimmed) return; // khali title save nahi hoga
+    if (!trimmed) return;
     dispatch(
       editTask({
         id: task.id,
-        updates: { title: trimmed, priority: editPriority },
+        updates: {
+          title: trimmed,
+          priority: editPriority,
+          dueDate: editDueDate || null, // NEW: khali = date hata do
+        },
       })
     );
-    setEditing(false); // wapas view mode
+    setEditing(false);
   };
 
   const cancelEdit = () => {
-    // purani values wapas, kuch save nahi
     setEditTitle(task.title);
     setEditPriority(task.priority);
+    setEditDueDate(task.dueDate ?? ""); // NEW
     setEditing(false);
   };
 
   return (
-    // "group" lagane se andar ke elements "group-hover:" use kar sakte hain
     <div
       className={cn(
         "group relative flex items-start gap-3 p-4 rounded-xl border transition-all duration-200",
@@ -47,7 +70,7 @@ export function TaskItem({ task }) {
           : "bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-md"
       )}
     >
-      {/* Priority dot: red / amber / green */}
+      {/* Priority dot */}
       <div
         className={cn(
           "mt-1 w-2.5 h-2.5 rounded-full flex-shrink-0 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-zinc-800 opacity-70",
@@ -69,7 +92,7 @@ export function TaskItem({ task }) {
         {task.completed && <Icons.Check />}
       </button>
 
-      {/* Content: editing true/false ke hisaab se alag UI */}
+      {/* Content */}
       <div className="flex-1 min-w-0">
         {editing ? (
           // ---------- EDIT MODE ----------
@@ -83,7 +106,8 @@ export function TaskItem({ task }) {
               }}
               autoFocus
             />
-            <div className="flex items-center gap-2">
+            {/* flex-wrap: chhoti screen par neeche wrap ho jaye */}
+            <div className="flex flex-wrap items-center gap-2">
               <Select
                 value={editPriority}
                 onChange={(e) => setEditPriority(e.target.value)}
@@ -93,6 +117,16 @@ export function TaskItem({ task }) {
                 <option value="medium">🟡 Medium</option>
                 <option value="low">🟢 Low</option>
               </Select>
+
+              {/* NEW: edit mode mein date picker */}
+              <Input
+                type="date"
+                value={editDueDate}
+                onChange={(e) => setEditDueDate(e.target.value)}
+                aria-label="Due date"
+                className="w-auto text-xs [color-scheme:light] dark:[color-scheme:dark]"
+              />
+
               <Button size="sm" variant="success" onClick={saveEdit}>
                 <Icons.Save />
                 <span className="ml-1">Save</span>
@@ -116,24 +150,38 @@ export function TaskItem({ task }) {
               {task.title}
             </p>
 
-            <div className="flex items-center gap-2 mt-1.5">
+            {/* flex-wrap: badge + created date + due chip ek line mein na samayein to neeche */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1.5">
               <Badge variant={task.priority}>
                 {PRIORITY_ICONS[task.priority]}{" "}
-                {/* "high" -> "High" */}
                 {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
               </Badge>
+
               <span className="text-xs text-zinc-400 dark:text-zinc-500">
                 {new Date(task.createdAt).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
                 })}
               </span>
+
+              {/* NEW: due chip, sirf tab jab dueDate set ho */}
+              {dueLabel && (
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1 text-xs font-medium [&_svg]:w-3 [&_svg]:h-3",
+                    DUE_STYLES[dueStatus]
+                  )}
+                >
+                  <Icons.Calendar />
+                  {dueLabel}
+                </span>
+              )}
             </div>
           </>
         )}
       </div>
 
-      {/* Edit + Delete buttons: sirf hover par dikhte hain */}
+      {/* Hover buttons */}
       {!editing && (
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button
