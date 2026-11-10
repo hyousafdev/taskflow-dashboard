@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
-import { useAppDispatch } from "@/hooks/useAppStore";
+import { useAppDispatch, useAppSelector } from "@/hooks/useAppStore";
 import { useTaskStats } from "@/hooks/useTaskStats";
 import { useFilteredTasks } from "@/hooks/useFilteredTasks";
 import { clearCompleted } from "@/store/tasksSlice";
@@ -10,12 +10,11 @@ export function ListToolbar() {
 
   const { total, completed } = useTaskStats();
   const visible = useFilteredTasks().length;
+  const sortBy = useAppSelector((s) => s.filter.sortBy); // NEW
 
-  // Alag function: JSX saaf rehta hai
   const handleClear = () => {
-    // confirm() browser ka popup hai: OK dabao to true, Cancel dabao to false
     if (window.confirm(`Delete ${completed} completed task(s)?`)) {
-      dispatch(clearCompleted()); // sirf OK par delete hoga
+      dispatch(clearCompleted());
     }
   };
 
@@ -23,6 +22,8 @@ export function ListToolbar() {
     <div className="flex items-center justify-between mb-3 px-1">
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
         Showing {visible} of {total} tasks
+        {/* NEW: hint sirf manual mode mein */}
+        {sortBy === "manual" && " · Drag ⠿ to reorder"}
       </p>
 
       <Button
