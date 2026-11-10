@@ -8,23 +8,28 @@ import { clearCompleted } from "@/store/tasksSlice";
 export function ListToolbar() {
   const dispatch = useAppDispatch();
 
-  // Purane hooks dobara use ho rahe hain: koi naya logic nahi likha
-  const { total, completed } = useTaskStats(); // sab tasks ke counts
-  const visible = useFilteredTasks().length;   // filter ke baad kitne dikh rahe hain
+  const { total, completed } = useTaskStats();
+  const visible = useFilteredTasks().length;
+
+  // Alag function: JSX saaf rehta hai
+  const handleClear = () => {
+    // confirm() browser ka popup hai: OK dabao to true, Cancel dabao to false
+    if (window.confirm(`Delete ${completed} completed task(s)?`)) {
+      dispatch(clearCompleted()); // sirf OK par delete hoga
+    }
+  };
 
   return (
     <div className="flex items-center justify-between mb-3 px-1">
-      {/* Left: filter ke baad kitne dikh rahe hain */}
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
         Showing {visible} of {total} tasks
       </p>
 
-      {/* Right: completed tasks ek saath hatao */}
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => dispatch(clearCompleted())}
-        disabled={completed === 0} // koi completed nahi to button band
+        onClick={handleClear}
+        disabled={completed === 0}
         className="gap-1.5 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
       >
         <Icons.Trash />
