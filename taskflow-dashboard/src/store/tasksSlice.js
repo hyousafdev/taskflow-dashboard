@@ -55,28 +55,30 @@ const tasksSlice = createSlice({
       });
     },
 
-    // NEW: action.payload = task ka id
     toggleTask: (state, action) => {
       const task = state.tasks.find((t) => t.id === action.payload);
-      if (task) task.completed = !task.completed; // true <-> false
+      if (task) task.completed = !task.completed;
     },
 
-    // NEW: action.payload = task ka id
     deleteTask: (state, action) => {
-      // jis id ka task hatana hai, usko chhod kar baaki rakho
       state.tasks = state.tasks.filter((t) => t.id !== action.payload);
     },
 
-    // NEW: action.payload = { id, updates: { title, priority } }
     editTask: (state, action) => {
       const task = state.tasks.find((t) => t.id === action.payload.id);
-      // Object.assign sirf wahi fields badalta hai jo updates mein hain
-      // completed aur createdAt waise hi rehte hain
       if (task) Object.assign(task, action.payload.updates);
+    },
+
+    // NEW: koi payload nahi chahiye
+    // Sirf wahi tasks rakho jo completed NAHI hain
+    clearCompleted: (state) => {
+      state.tasks = state.tasks.filter((t) => !t.completed);
     },
   },
 });
 
-export const { addTask, toggleTask, deleteTask, editTask } = tasksSlice.actions;
+// NEW: clearCompleted export mein add
+export const { addTask, toggleTask, deleteTask, editTask, clearCompleted } =
+  tasksSlice.actions;
 
 export default tasksSlice.reducer;

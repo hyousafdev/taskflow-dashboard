@@ -4,7 +4,8 @@ import { Header } from "@/components/layout/Header";
 import { StatsBar } from "@/components/layout/StatsBar";
 import { AddTaskForm } from "@/components/tasks/AddTaskForm";
 import { FilterBar } from "@/components/tasks/FilterBar";
-import { TaskList } from "@/components/tasks/TaskList"; // NEW
+import { TaskList } from "@/components/tasks/TaskList";
+import { ListToolbar } from "@/components/tasks/ListToolbar"; // NEW
 
 export default function App() {
   const dark = useAppSelector((s) => s.ui.dark);
@@ -20,7 +21,8 @@ export default function App() {
         <StatsBar />
         <AddTaskForm />
         <FilterBar />
-        <TaskList /> {/* NEW */}
+        <ListToolbar /> {/* NEW */}
+        <TaskList />
       </div>
     </div>
   );
