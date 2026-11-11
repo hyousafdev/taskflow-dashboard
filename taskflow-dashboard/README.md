@@ -139,8 +139,6 @@ User action -> dispatch(action) -> reducer updates store -> subscribed component
 
 ## Roadmap
 
-## Roadmap
-
 - ✅ Persist tasks in `localStorage`
 - ✅ "Clear completed" button
 - ✅ Due dates
