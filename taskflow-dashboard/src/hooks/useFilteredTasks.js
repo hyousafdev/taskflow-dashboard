@@ -21,9 +21,21 @@ export function useFilteredTasks() {
       result = result.filter((t) => t.priority === priority);
     }
 
-    // NEW: manual mode mein sort mat karo, store ka order hi order hai
+    // Manual mode mein sort skip: store ka order hi order hai
     if (sortBy !== "manual") {
       result.sort((a, b) => {
+        // NEW: due date sort
+        if (sortBy === "dueDate") {
+          // Bina date wale HAMESHA neeche (direction se farq nahi)
+          if (!a.dueDate && !b.dueDate) return 0;
+          if (!a.dueDate) return 1;
+          if (!b.dueDate) return -1;
+
+          // "2026-11-05" format mein string compare sahi chalta hai
+          const cmp = a.dueDate.localeCompare(b.dueDate);
+          return sortDir === "asc" ? cmp : -cmp;
+        }
+
         let cmp = 0;
 
         if (sortBy === "title") {

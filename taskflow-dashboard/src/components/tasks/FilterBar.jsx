@@ -24,9 +24,10 @@ const PRIORITY_OPTIONS = [
 
 const SORT_OPTIONS = [
   { key: "createdAt", label: "Date" },
+  { key: "dueDate", label: "Due" }, // NEW
   { key: "title", label: "A → Z" },
   { key: "priority", label: "Priority" },
-  { key: "manual", label: "Manual" }, // NEW
+  { key: "manual", label: "Manual" },
 ];
 
 // Pill ke styles
